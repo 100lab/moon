@@ -18,7 +18,6 @@ class MoonInsta(Moon):
             else:
                 break
 
-
         count = tag.text
         return count
 

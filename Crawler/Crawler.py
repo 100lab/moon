@@ -1,31 +1,37 @@
 from MoonInsta import MoonInsta
-import selenium.webdriver as webdriver
 from WordList import get_words
+import selenium.webdriver as webdriver
+from urllib import parse
+import redis
 
 def main():
     print('***start mooncle crawler***')
     
+    # initialize for chrome browser
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('headless')
     chrome_options.add_argument('disable-gpu')
     browser = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
 
-    moon = MoonInsta(browser)
+    # initialize for redis db
+    r = redis.Redis(db = 0)
 
+    # initialize for Moon
+    moon = MoonInsta(browser)
+    
+    #initialize for words
     words = get_words()
 
+    #crawling logic
     for word in words:
         count = moon.get_word_count(word)
+        encoded_word = parse.quote(word)
+        r.set(encoded_word,count)
         print(word + " : " + count)
-
-    #ret = moon.get_word_count('존맛탱')
-    #print("존맛탱:" + ret)
-    #ret = moon.get_word_count('jmt')
-    #print('jmt:' + ret)    
-    #ret = moon.get_word_count('osaka')
-    #print('osaka:' + ret)
-
+    
+    #finalize
     browser.close()
+    
     pass
 
 if __name__ == '__main__':
