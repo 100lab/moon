@@ -3,6 +3,8 @@ from WordList import get_words
 import selenium.webdriver as webdriver
 from urllib import parse
 import redis
+import json
+import operator
 
 def main():
     print('***start mooncle crawler***')
@@ -15,20 +17,31 @@ def main():
 
     # initialize for redis db
     r = redis.Redis(db = 0)
+    #r = redis.StrictRedis()
 
     # initialize for Moon
     moon = MoonInsta(browser)
     
     #initialize for words
     words = get_words()
+    dictionary = {}
 
     #crawling logic
     for word in words:
         count = moon.get_word_count(word)
         encoded_word = parse.quote(word)
-        r.set(encoded_word,count)
-        print(word + " : " + count)
+        dictionary[word] = count
+        #r.set(encoded_word,count)
     
+    dictionary = sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True)
+
+    result = json.dumps(dictionary)
+    print(result)
+
+    #r.execute_command('JSON.SET', 'object', '.', result)
+    #reply = json.loads(r.execute_command('JSON.GET', 'object'))
+    #print(reply)
+
     #finalize
     browser.close()
     
