@@ -22,13 +22,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Crawler.py" />
+    <Compile Include="WordDB.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Moon.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MoonInsta.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="WordList.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

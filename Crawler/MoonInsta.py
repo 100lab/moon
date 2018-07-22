@@ -18,7 +18,7 @@ class MoonInsta(Moon):
             else:
                 break
 
-        count = tag.text
+        count = int(tag.text.replace(',',''))
         return count
 
 
