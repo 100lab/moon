@@ -34,7 +34,9 @@ def main():
     #crawling logic
     print('start crawling')
     for word in wdb.get_words():
-        count = moon.get_word_count(word)
+        count = moon.get_word_count(word) # remove it for faster debug
+        # count = 0
+        # fix me : if count == 0 then notify throw Slack
         word_count_tuples[word] = count
         print(word + ":" + str(count))
     #sort
@@ -51,8 +53,17 @@ def main():
         word = wct[0]
         count = wct[1]
         encoded_word = parse.quote(word)
-        r.set(encoded_word,count)
+        r.set(encoded_word,count) # remove it for faster debug
         print("(d)" + word + "(e)" + encoded_word + ":" + str(count))
+
+    ## mean
+    for wct in word_count_tuples:
+        word = wct[0]
+        word_mean = "mean_" + word
+        encoded_word_mean = parse.quote(word_mean)
+        mean = wdb.get_mean(word)
+        r.set(encoded_word_mean, mean)
+        print("(d)" + word_mean + "(e)" + encoded_word_mean + ":" + mean)
 
     ## top 20 word
     r.delete("top20_words")
@@ -67,8 +78,18 @@ def main():
 
     print("check db values")
     tmps = r.lrange("top20_words",0,-1)
-    for tmp in tmps:
-        print(tmp)
+    for btmp in tmps:
+        word = btmp.decode('utf-8')
+        mean_word = "mean_" + word
+        encoded_word_mean = parse.quote(mean_word)
+        bmean = r.get(encoded_word_mean)
+        mean = bmean.decode('utf-8')
+        
+        encoded_word = parse.quote(word)
+        bcount = r.get(encoded_word)
+        count = int(bcount.decode('utf-8'))
+        print(word + " [" + str(count) + "] : " + mean)
+        
     
     #finalize
     browser.close()

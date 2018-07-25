@@ -17,6 +17,9 @@ class MoonInsta(Moon):
                 time.sleep(1)
             else:
                 break
+        if not tag:
+            print("err:" + word)
+            return 0
 
         count = int(tag.text.replace(',',''))
         return count
