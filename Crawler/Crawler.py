@@ -21,7 +21,7 @@ def main():
     # initialize redis db
     print('initialize redis db')
     r = redis.Redis(db = 0)
-
+    
     # initialize Moon
     print('initialize moon')
     moon = MoonInsta(browser)
@@ -36,9 +36,18 @@ def main():
     for word in wdb.get_words():
         count = moon.get_word_count(word) # remove it for faster debug
         # count = 0
-        # fix me : if count == 0 then notify throw Slack
+
+        #err handling
+        if count == 0:
+            tmp = r.get(parse.quote(word))
+            if (tmp == None):
+                count = 0
+            else:
+                count = int(tmp.decode("utf-8"))
+
         word_count_tuples[word] = count
         print(word + ":" + str(count))
+
     #sort
     word_count_tuples = sorted(word_count_tuples.items(), key=operator.itemgetter(1), reverse=True)
         
