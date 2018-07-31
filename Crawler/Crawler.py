@@ -1,6 +1,6 @@
 from MoonInsta import MoonInsta
 import selenium.webdriver as webdriver
-from urllib import parse
+import urllib.parse
 from WordDB import WordDB
 import redis
 import operator
@@ -10,13 +10,17 @@ def main():
     print('***start mooncle crawler***')
     print(datetime.datetime.now())
 
-
     # initialize for chrome browser
-    print('initialize for chrome browser')
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('headless')
-    chrome_options.add_argument('disable-gpu')
-    browser = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+    #print('initialize for chrome browser')
+    #chrome_options = webdriver.ChromeOptions()
+    #chrome_options.add_argument('headless')
+    #chrome_options.add_argument('disable-gpu')
+    #browser = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+
+    print('initialize for firefox browser')
+    firefox_options = webdriver.FirefoxOptions()
+    firefox_options.add_argument('--headless')
+    browser = webdriver.Firefox(firefox_options=firefox_options)
 
     # initialize redis db
     print('initialize redis db')
@@ -36,10 +40,10 @@ def main():
     for word in wdb.get_words():
         count = moon.get_word_count(word) # remove it for faster debug
         # count = 0
-
+        
         #err handling
         if count == 0:
-            tmp = r.get(parse.quote(word))
+            tmp = r.get(urllib.parse.quote(word))
             if (tmp == None):
                 count = 0
             else:
@@ -61,7 +65,7 @@ def main():
     for wct in word_count_tuples:
         word = wct[0]
         count = wct[1]
-        encoded_word = parse.quote(word)
+        encoded_word = urllib.parse.quote(word)
         r.set(encoded_word,count) # remove it for faster debug
         print("(d)" + word + "(e)" + encoded_word + ":" + str(count))
 
@@ -69,7 +73,7 @@ def main():
     for wct in word_count_tuples:
         word = wct[0]
         word_mean = "mean_" + word
-        encoded_word_mean = parse.quote(word_mean)
+        encoded_word_mean = urllib.parse.quote(word_mean)
         mean = wdb.get_mean(word)
         r.set(encoded_word_mean, mean)
         print("(d)" + word_mean + "(e)" + encoded_word_mean + ":" + mean)
@@ -90,11 +94,11 @@ def main():
     for btmp in tmps:
         word = btmp.decode('utf-8')
         mean_word = "mean_" + word
-        encoded_word_mean = parse.quote(mean_word)
+        encoded_word_mean = urllib.parse.quote(mean_word)
         bmean = r.get(encoded_word_mean)
         mean = bmean.decode('utf-8')
         
-        encoded_word = parse.quote(word)
+        encoded_word = urllib.parse.quote(word)
         bcount = r.get(encoded_word)
         count = int(bcount.decode('utf-8'))
         print(word + " [" + str(count) + "] : " + mean)
